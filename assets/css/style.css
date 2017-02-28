@@ -1,0 +1,42 @@
+html,
+body {
+  height: 100%;
+}
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  margin: 0;
+}
+#browse-font {
+  display: flex;
+  height: 100%;
+}
+#browse-font > .categories {
+  background-color: #ccc;
+  overflow: auto;
+  padding: 20px;
+}
+#browse-font > .categories > .category {
+  color: inherit;
+  display: block;
+}
+#browse-font > .categories > .category:not(:last-child) {
+  margin-bottom: 10px;
+}
+#browse-font > .categories > .category:not(:hover):not(.active) {
+  text-decoration: none;
+}
+#browse-font > .fonts {
+  flex-grow: 1;
+  overflow: auto;
+  padding: 20px;
+}
+#browse-font > .fonts > .font:not(:last-child) {
+  margin-bottom: 10px;
+}
+#browse-font > .fonts > .font > .name {
+  font-size: 24px;
+}
+#browse-font > .fonts > .font > .category {
+  font-size: 12px;
+}

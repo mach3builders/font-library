@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Font Library</title>
+<meta charset="utf-8">
+<link rel="stylesheet" href="assets/css/style.css">
+<script src="node_modules/jquery/dist/jquery.min.js"></script>
+<script src="node_modules/vue/dist/vue.min.js"></script>
+<script src="node_modules/webfontloader/webfontloader.js"></script>
+</head>
+<body>
+<div id="browse-font">
+	<div class="categories">
+		<a href="#" class="category" v-for="(category, index) in categories" :class="getActive(index)" @click.prevent="setCategory(index)">{{ category }}</a>
+	</div>
+	<div class="fonts" @scroll="lazyLoad">
+		<div class="font" v-for="(font, index) in categoryFonts" :key="font.index">
+			<div class="name" :style="{ 'font-family': font.family }">{{ font.family }}</div>
+			<div class="category">{{ font.category }}</div>
+		</div>
+	</div>
+</div>
+<script src="assets/js/script.js"></script>
+</body>
+</html>
