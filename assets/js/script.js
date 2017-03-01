@@ -1,10 +1,15 @@
-/*var $ = require('jquery');
+/*
+https://www.googleapis.com/webfonts/v1/webfonts?key=AIzaSyCwmsa6nYDn0eZk_wzchsONgC3wO8nDmw0
+
+var $ = require('jquery');
 var Vue = require('vue');
-var WebFont = require('webfontloader');*/
+var WebFont = require('webfontloader');
+*/
 
 var browseFont = new Vue({
 	el: '#browse-font',
 	data: {
+		search: '',
 		categories: [
 			'Serif',
 			'Sans Serif',
@@ -12,46 +17,90 @@ var browseFont = new Vue({
 			'Handwriting',
 			'Monospace'
 		],
-		categoryIndex: 0,
-		categoriesFontCount: [],
+		categoryIndex: -1,
 		fonts: [],
-		fontsPerPage: 10
+		stageFontCount: 0,
+		stageLimit: 5,
+		stageLoading: true,
+		loadedFamilies: []
+	},
+	created: function() {
+		$.getJSON('assets/json/fonts.json', function(data) {
+			browseFont.fonts = data.items
+		})
+	},
+	mounted: function() {
 	},
 	computed: {
-		categorySlug: function() {
-			return this.categories[this.categoryIndex].replace(' ', '-').toLowerCase()
+		categoriresFonts: function() {
+			var categoriresFonts = []
+			var categories = this.categories.map(function(category) {
+				return category.replace(' ', '-').toLowerCase()
+			})
+			
+			$.each(this.fonts, function(index, font) {
+				var categoryIndex = categories.indexOf(font.category)
+				
+				if (categoriresFonts[categoryIndex]) {
+					categoriresFonts[categoryIndex].push(font)
+				} else {
+					categoriresFonts[categoryIndex] = [font]
+				}
+			});
+			
+			return categoriresFonts
 		},
-		categoryFonts: function() {
-			if (this.fonts.length) {
-				var categoryFontCount = this.categoriesFontCount[this.categoryIndex] || 0
-				var categoryFonts = this.fonts.filter(function(font) {
-					return font.category === browseFont.categorySlug
+		stageFonts: function() {
+			var stageFonts = []
+			
+			if (this.categoryIndex === -1) {
+				stageFonts = this.fonts.filter(function(font) {
+					return font.family.toLowerCase().search(browseFont.search.toLowerCase()) !== -1
 				})
-				
-				categoryFontCount += this.fontsPerPage
-				
-				this.categoriesFontCount[this.categoryIndex] = categoryFontCount
-				
-				return categoryFonts.slice(0, categoryFontCount)
+			} else {
+				stageFonts = this.categoriresFonts[this.categoryIndex] || [];
 			}
-		},
-		categoryFamilies: function() {
-			if (this.categoryFonts) {
-				var categoryFonts = this.categoryFonts.slice(-this.fontsPerPage);
-				
-				return categoryFonts.map(function(categoryFont) {
-					return categoryFont.family
-				})
-			}
+			
+			return stageFonts.slice(0, this.stageFontCount + this.stageLimit)
 		}
 	},
 	watch: {
-		categoryFamilies: function() {
-			WebFont.load({
-				google: {
-					families: this.categoryFamilies
+		search: function() {
+			this.categoryIndex = -1
+		},
+		stageFonts: function() {
+			var loadFamilies = []
+			
+			$.each(this.stageFonts, function(index, stageFont) {
+				if (browseFont.loadedFamilies.indexOf(stageFont.family) === -1) {
+					loadFamilies.push(stageFont.family)
 				}
 			})
+			
+			if (loadFamilies.length) {
+				// this.fontsInit = true
+				this.stageLoading = true
+				
+				WebFont.load({
+					google: {
+						families: loadFamilies
+					},
+					loading: function() {
+						// browseFont.fontsInit = false
+					},
+					active: function() {
+						browseFont.stageLoading = false
+						
+						browseFont.loadedFamilies.concat(loadFamilies)
+					},
+					fontloading: function(familyName) {
+						// console.log(familyName);
+					},
+					fontactive: function(familyName) {
+						// console.log(familyName);
+					}
+				})
+			}
 		}
 	},
 	methods: {
@@ -62,11 +111,12 @@ var browseFont = new Vue({
 			this.categoryIndex = index
 		},
 		lazyLoad: function(event) {
+			var $target = $(event.target);
+			var $inner = $target.children('.inner:first');
+			
+			if ($target.scrollTop() + $target.outerHeight() >= $inner.outerHeight(true)) {
+				this.stageFontCount += this.stageLimit
+			}
 		}
 	}
-})
-
-// $.getJSON('https://www.googleapis.com/webfonts/v1/webfonts?key=AIzaSyCwmsa6nYDn0eZk_wzchsONgC3wO8nDmw0', function(data) {
-$.getJSON('assets/json/fonts.json', function(data) {
-	browseFont.fonts = data.items
 })

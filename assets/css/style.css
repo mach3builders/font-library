@@ -11,32 +11,47 @@ body {
   display: flex;
   height: 100%;
 }
-#browse-font > .categories {
+#browse-font > .sidebar {
   background-color: #ccc;
   overflow: auto;
   padding: 20px;
+  width: 200px;
 }
-#browse-font > .categories > .category {
+#browse-font > .sidebar > .search:not(:last-child) {
+  margin-bottom: 20px;
+}
+#browse-font > .sidebar > .search > input {
+  background-color: #fff;
+  padding: 5px;
+  width: 100%;
+}
+#browse-font > .sidebar > .categories > .category {
   color: inherit;
   display: block;
 }
-#browse-font > .categories > .category:not(:last-child) {
+#browse-font > .sidebar > .categories > .category:not(:last-child) {
   margin-bottom: 10px;
 }
-#browse-font > .categories > .category:not(:hover):not(.active) {
-  text-decoration: none;
+#browse-font > .sidebar > .categories > .category:hover,
+#browse-font > .sidebar > .categories > .category.active {
+  text-decoration: underline;
 }
-#browse-font > .fonts {
-  flex-grow: 1;
-  overflow: auto;
+#browse-font > .stage.loading > .inner {
+  opacity: .5;
+}
+#browse-font > .stage > .inner {
   padding: 20px;
 }
-#browse-font > .fonts > .font:not(:last-child) {
+#browse-font > .stage > .inner > .fonts {
+  flex-grow: 1;
+  overflow: auto;
+}
+#browse-font > .stage > .inner > .fonts > .font:not(:last-child) {
   margin-bottom: 10px;
 }
-#browse-font > .fonts > .font > .name {
+#browse-font > .stage > .inner > .fonts > .font > .name {
   font-size: 24px;
 }
-#browse-font > .fonts > .font > .category {
+#browse-font > .stage > .inner > .fonts > .font > .category {
   font-size: 12px;
 }

@@ -13,41 +13,68 @@ body {
 	display: flex;
 	height: 100%;
 	
-	> .categories {
+	> .sidebar {
 		background-color: #ccc;
 		overflow: auto;
 		padding: 20px;
+		width: 200px;
 		
-		> .category {
-			color: inherit;
-			display: block;
-			
+		> .search {
 			&:not(:last-child) {
-				margin-bottom: 10px;
+				margin-bottom: 20px;
 			}
 			
-			&:not(:hover):not(.active) {
-				text-decoration: none;
+			> input {
+				background-color: #fff;
+				padding: 5px;
+				width: 100%;
+			}
+		}
+		
+		> .categories {
+			> .category {
+				color: inherit;
+				display: block;
+				
+				&:not(:last-child) {
+					margin-bottom: 10px;
+				}
+				
+				&:hover,
+				&.active {
+					text-decoration: underline;;
+				}
 			}
 		}
 	}
 	
-	> .fonts {
-		flex-grow: 1;
-		overflow: auto;
-		padding: 20px;
+	> .stage {
+		&.loading {
+			> .inner {
+				opacity: .5;
+			}
+		}
 		
-		> .font {
-			&:not(:last-child) {
-				margin-bottom: 10px;
-			}
+		> .inner {
+			padding: 20px;
 			
-			> .name {
-				font-size: 24px;
-			}
-			
-			> .category {
-				font-size: 12px;
+			> .fonts {
+				flex-grow: 1;
+				overflow: auto;
+				
+				> .font {
+					&:not(:last-child) {
+						margin-bottom: 10px;
+					}
+					
+					> .name {
+						font-size: 24px;
+					}
+					
+					> .category {
+						font-size: 12px;
+					}
+				}
 			}
 		}
 	}
