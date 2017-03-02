@@ -10,21 +10,24 @@
 <script src="node_modules/webfontloader/webfontloader.js"></script>
 </head>
 <body>
-<div id="browse-font" v-cloak>
+<div id="browse-font">
 	<div class="sidebar">
 		<div class="search">
 			<input type="text" placeholder="Search" autofocus v-model.lazy="search">
 		</div>
 		<div class="categories">
-			<a href="#" class="category" v-for="(category, index) in categories" :class="getActive(index)" @click.prevent="setCategory(index)">{{ category }}</a>
+			<a href="#" class="category" v-for="(category, index) in categories" :key="category.index" :class="getActive(category)" @click.prevent="setCategory(category)">{{category}}</a>
 		</div>
 	</div>
-	<div class="stage" :class="{ loading: stageLoading }" @scroll="lazyLoad">
+	<div class="stage" @scroll="lazyLoad">
 		<div class="inner">
 			<div class="fonts">
-				<div class="font" v-for="(font, index) in stageFonts" :key="font.index">
-					<div class="name" :style="{ 'font-family': font.family }">{{ font.family }}</div>
-					<div class="category">{{ font.category }}</div>
+				<div class="font" v-for="(font, index) in stageFonts" :key="font.index" :class="{init: font.init, loaded: font.loaded}">
+					<div class="variants">
+						<a href="#" class="variant" v-for="(variant, index) in font.variants" :key="variant.index" @click.prevent="setVariant(variant)">{{variant}}</a>
+					</div>
+					<div class="name" :style="{'font-family': font.family}">{{font.family}}</div>
+					<div class="category">{{font.category}}</div>
 				</div>
 			</div>
 		</div>

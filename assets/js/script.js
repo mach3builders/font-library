@@ -1,9 +1,9 @@
 /*
 https://www.googleapis.com/webfonts/v1/webfonts?key=AIzaSyCwmsa6nYDn0eZk_wzchsONgC3wO8nDmw0
 
-var $ = require('jquery');
-var Vue = require('vue');
-var WebFont = require('webfontloader');
+var $ = require('jquery')
+var Vue = require('vue')
+var WebFont = require('webfontloader')
 */
 
 var browseFont = new Vue({
@@ -11,18 +11,16 @@ var browseFont = new Vue({
 	data: {
 		search: '',
 		categories: [
-			'Serif',
-			'Sans Serif',
-			'Display',
-			'Handwriting',
-			'Monospace'
+			'serif',
+			'sans-serif',
+			'display',
+			'handwriting',
+			'monospace'
 		],
-		categoryIndex: -1,
+		category: '',
 		fonts: [],
 		stageFontCount: 0,
-		stageLimit: 5,
-		stageLoading: true,
-		loadedFamilies: []
+		stageLimit: 5
 	},
 	created: function() {
 		$.getJSON('assets/json/fonts.json', function(data) {
@@ -32,87 +30,87 @@ var browseFont = new Vue({
 	mounted: function() {
 	},
 	computed: {
-		categoriresFonts: function() {
-			var categoriresFonts = []
-			var categories = this.categories.map(function(category) {
-				return category.replace(' ', '-').toLowerCase()
-			})
-			
-			$.each(this.fonts, function(index, font) {
-				var categoryIndex = categories.indexOf(font.category)
-				
-				if (categoriresFonts[categoryIndex]) {
-					categoriresFonts[categoryIndex].push(font)
-				} else {
-					categoriresFonts[categoryIndex] = [font]
-				}
-			});
-			
-			return categoriresFonts
-		},
 		stageFonts: function() {
-			var stageFonts = []
-			
-			if (this.categoryIndex === -1) {
-				stageFonts = this.fonts.filter(function(font) {
-					return font.family.toLowerCase().search(browseFont.search.toLowerCase()) !== -1
-				})
+			if (this.fonts.length) {
+				var stageFonts = []
+				
+				if (this.category) {
+					stageFonts = this.fonts.filter(function(font) {
+						return font.category === browseFont.category
+					})
+				} else {
+					stageFonts = this.fonts.filter(function(font) {
+						return font.family.toLowerCase().search(browseFont.search.toLowerCase()) !== -1
+					})
+				}
+				
+				return stageFonts.slice(0, this.stageFontCount + this.stageLimit)
 			} else {
-				stageFonts = this.categoriresFonts[this.categoryIndex] || [];
+				return []
 			}
-			
-			return stageFonts.slice(0, this.stageFontCount + this.stageLimit)
 		}
 	},
 	watch: {
 		search: function() {
-			this.categoryIndex = -1
+			this.category = ''
+		},
+		category: function() {
+			this.stageFontCount = 0
 		},
 		stageFonts: function() {
-			var loadFamilies = []
+			console.log('test');
 			
-			$.each(this.stageFonts, function(index, stageFont) {
-				if (browseFont.loadedFamilies.indexOf(stageFont.family) === -1) {
-					loadFamilies.push(stageFont.family)
+			var loadFamilies = []
+			var loadFonts = this.stageFonts.filter(function(font) {
+				if (font.loaded) {
+					return false
+				} else {
+					loadFamilies.push(font.family)
+					
+					return true
 				}
 			})
 			
 			if (loadFamilies.length) {
-				// this.fontsInit = true
-				this.stageLoading = true
-				
 				WebFont.load({
 					google: {
 						families: loadFamilies
 					},
-					loading: function() {
-						// browseFont.fontsInit = false
-					},
-					active: function() {
-						browseFont.stageLoading = false
-						
-						browseFont.loadedFamilies.concat(loadFamilies)
-					},
 					fontloading: function(familyName) {
-						// console.log(familyName);
+						var index = browseFont.getIndex(loadFonts, 'family', familyName)
+						
+						// browseFont.$set(browseFont.fonts[index], 'init', true)
+						// browseFont.$set(browseFont.stageFonts[index], 'init', true)
 					},
 					fontactive: function(familyName) {
-						// console.log(familyName);
+						var index = browseFont.getIndex(loadFonts, 'family', familyName)
+						
+						// browseFont.$set(browseFont.fonts[index], 'loaded', true)
+						// browseFont.$set(browseFont.stageFonts[index], 'loaded', true)
 					}
 				})
 			}
 		}
 	},
 	methods: {
-		getActive: function(index) {
-			return { active: index === this.categoryIndex }
+		getIndex: function(array, key, value) {
+			for (var x in array) {
+				if (array[x][key] === value) {
+					return x
+				}
+			}
+			
+			return -1
 		},
-		setCategory: function(index) {
-			this.categoryIndex = index
+		getActive: function(category) {
+			return {active: category === this.category}
+		},
+		setCategory: function(category) {
+			this.category = category
 		},
 		lazyLoad: function(event) {
-			var $target = $(event.target);
-			var $inner = $target.children('.inner:first');
+			var $target = $(event.target)
+			var $inner = $target.children('.inner:first')
 			
 			if ($target.scrollTop() + $target.outerHeight() >= $inner.outerHeight(true)) {
 				this.stageFontCount += this.stageLimit

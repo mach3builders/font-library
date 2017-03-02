@@ -36,22 +36,48 @@ body {
 #browse-font > .sidebar > .categories > .category.active {
   text-decoration: underline;
 }
-#browse-font > .stage.loading > .inner {
-  opacity: .5;
-}
-#browse-font > .stage > .inner {
-  padding: 20px;
-}
-#browse-font > .stage > .inner > .fonts {
+#browse-font > .stage {
   flex-grow: 1;
   overflow: auto;
 }
+#browse-font > .stage.loading > .inner {
+  opacity: .5;
+}
+#browse-font > .stage > .inner > .fonts > .font {
+  padding: 20px;
+}
 #browse-font > .stage > .inner > .fonts > .font:not(:last-child) {
+  border-bottom: 1px solid #ccc;
+}
+#browse-font > .stage > .inner > .fonts > .font:not(.init) {
+  display: none;
+}
+#browse-font > .stage > .inner > .fonts > .font:not(.loaded) > .name {
+  visibility: hidden;
+}
+#browse-font > .stage > .inner > .fonts > .font:hover {
+  background-color: #eee;
+}
+#browse-font > .stage > .inner > .fonts > .font > .variants {
+  display: flex;
   margin-bottom: 10px;
+}
+#browse-font > .stage > .inner > .fonts > .font > .variants > .variant {
+  font-size: 12px;
+}
+#browse-font > .stage > .inner > .fonts > .font > .variants > .variant:not(:last-child) {
+  margin-right: 5px;
+}
+#browse-font > .stage > .inner > .fonts > .font > .variants > .variant:hover,
+#browse-font > .stage > .inner > .fonts > .font > .variants > .variant.active {
+  text-decoration: underline;
 }
 #browse-font > .stage > .inner > .fonts > .font > .name {
   font-size: 24px;
+  line-height: 30px;
+  margin-bottom: 5px;
 }
 #browse-font > .stage > .inner > .fonts > .font > .category {
   font-size: 12px;
+  font-style: italic;
 }
