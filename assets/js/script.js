@@ -1,11 +1,3 @@
-/*
-https://www.googleapis.com/webfonts/v1/webfonts?key=AIzaSyCwmsa6nYDn0eZk_wzchsONgC3wO8nDmw0
-
-var $ = require('jquery')
-var Vue = require('vue')
-var WebFont = require('webfontloader')
-*/
-
 var browseFont = new Vue({
 	el: '#browse-font',
 	data: {
@@ -17,104 +9,118 @@ var browseFont = new Vue({
 			'handwriting',
 			'monospace'
 		],
-		category: '',
+		selectedCategories: [],
+		fontHeight: 0,
+		stageHeight: 0,
 		fonts: [],
-		stageFontCount: 0,
-		stageLimit: 5
-	},
-	created: function() {
-		$.getJSON('assets/json/fonts.json', function(data) {
-			browseFont.fonts = data.items
-		})
+		stageFonts: [],
+		timer: 0
 	},
 	mounted: function() {
-	},
-	computed: {
-		stageFonts: function() {
-			if (this.fonts.length) {
-				var stageFonts = []
+		var $stage = $('#browse-font .stage:first')
+		
+		this.selectedCategories = this.categories
+		this.stageHeight = $stage.height()
+		
+		$(window).resize(function() {
+			browseFont.stageHeight = $stage.height()
+		})
+		
+		// https://www.googleapis.com/webfonts/v1/webfonts?key=AIzaSyCwmsa6nYDn0eZk_wzchsONgC3wO8nDmw0
+		$.getJSON('assets/json/fonts.json', function(data) {
+			browseFont.fonts = data.items.map(function(font) {
+				font.loaded = false
 				
-				if (this.category) {
-					stageFonts = this.fonts.filter(function(font) {
-						return font.category === browseFont.category
-					})
-				} else {
-					stageFonts = this.fonts.filter(function(font) {
-						return font.family.toLowerCase().search(browseFont.search.toLowerCase()) !== -1
-					})
-				}
-				
-				return stageFonts.slice(0, this.stageFontCount + this.stageLimit)
-			} else {
-				return []
-			}
-		}
+				return font
+			})
+			
+			browseFont.setStageFonts()
+		})
 	},
 	watch: {
 		search: function() {
-			this.category = ''
+			this.setStageFonts()
 		},
-		category: function() {
-			this.stageFontCount = 0
-		},
-		stageFonts: function() {
-			console.log('test');
-			
-			var loadFamilies = []
-			var loadFonts = this.stageFonts.filter(function(font) {
-				if (font.loaded) {
-					return false
-				} else {
-					loadFamilies.push(font.family)
-					
-					return true
-				}
-			})
-			
-			if (loadFamilies.length) {
-				WebFont.load({
-					google: {
-						families: loadFamilies
-					},
-					fontloading: function(familyName) {
-						var index = browseFont.getIndex(loadFonts, 'family', familyName)
-						
-						// browseFont.$set(browseFont.fonts[index], 'init', true)
-						// browseFont.$set(browseFont.stageFonts[index], 'init', true)
-					},
-					fontactive: function(familyName) {
-						var index = browseFont.getIndex(loadFonts, 'family', familyName)
-						
-						// browseFont.$set(browseFont.fonts[index], 'loaded', true)
-						// browseFont.$set(browseFont.stageFonts[index], 'loaded', true)
-					}
-				})
-			}
+		selectedCategories: function() {
+			this.setStageFonts()
 		}
 	},
 	methods: {
-		getIndex: function(array, key, value) {
-			for (var x in array) {
-				if (array[x][key] === value) {
-					return x
-				}
+		setStageFonts: function() {
+			if (this.fonts.length) {
+				var fonts = this.fonts.filter(function(font) {
+					var matchSearch = browseFont.search ? font.family.toLowerCase().search(browseFont.search.toLowerCase()) !== -1 : true
+					var matchCategories = true
+					
+					if (browseFont.selectedCategories.length < browseFont.categories.length) {
+						matchCategories = false
+						
+						for (var i=0; i<browseFont.selectedCategories.length; i++) {
+							if (font.category === browseFont.selectedCategories[i]) {
+								matchCategories = true
+								break
+							}
+						}
+					}
+					
+					return matchSearch && matchCategories
+				})
+				
+				this.stageFonts = fonts
+				
+				this.lazyLoad()
 			}
+		},
+		loadFonts: function(start, end) {
+			fonts = this.stageFonts.filter(function(font) {
+				return !font.loaded
+			})
 			
-			return -1
-		},
-		getActive: function(category) {
-			return {active: category === this.category}
-		},
-		setCategory: function(category) {
-			this.category = category
+			var families = []
+			var indexes = fonts.map(function(font) {
+				families.push(font.family)
+				
+				return font.family
+			})
+			
+			families = families.slice(start, end)
+			
+			console.log(families);
+			
+			// for (var i=0; i<families.length; i++) {
+			if (families.length) {
+				WebFont.load({
+					google: {
+						// families: [families[i]]
+						families: families
+					},
+					fontactive: function(familyName) {
+						browseFont.fonts[indexes.indexOf(familyName)].loaded = true
+						browseFont.stageFonts[indexes.indexOf(familyName)].loaded = true
+					}
+				})
+			}
 		},
 		lazyLoad: function(event) {
-			var $target = $(event.target)
-			var $inner = $target.children('.inner:first')
+			var duration = 0
 			
-			if ($target.scrollTop() + $target.outerHeight() >= $inner.outerHeight(true)) {
-				this.stageFontCount += this.stageLimit
+			if (this.timer) {
+				clearTimeout(this.timer)
+				duration = 500
 			}
+			
+			this.timer = setTimeout(function() {
+				if (!browseFont.fontHeight) {
+					browseFont.fontHeight = $('#browse-font .font:first').outerHeight(true);
+				}
+				
+				var scrollTop = event ? $(event.target).scrollTop() : 0
+				var start = Math.floor(scrollTop / browseFont.fontHeight)
+				var end = start + Math.ceil(browseFont.stageHeight / browseFont.fontHeight) + 1
+				
+				browseFont.loadFonts(start, end)
+			},
+			duration)
 		}
 	}
 })

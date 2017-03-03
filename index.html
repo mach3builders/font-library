@@ -13,16 +13,19 @@
 <div id="browse-font">
 	<div class="sidebar">
 		<div class="search">
-			<input type="text" placeholder="Search" autofocus v-model.lazy="search">
+			<input type="text" placeholder="Search" autofocus v-model="search">
 		</div>
 		<div class="categories">
-			<a href="#" class="category" v-for="(category, index) in categories" :key="category.index" :class="getActive(category)" @click.prevent="setCategory(category)">{{category}}</a>
+			<div class="category" v-for="(category, index) in categories">
+				<input type="checkbox" v-model="selectedCategories" :value="category" :id="'field-category-' + index">
+				<label :for="'field-category-' + index">{{category}}</label>
+			</div>
 		</div>
 	</div>
 	<div class="stage" @scroll="lazyLoad">
 		<div class="inner">
 			<div class="fonts">
-				<div class="font" v-for="(font, index) in stageFonts" :key="font.index" :class="{init: font.init, loaded: font.loaded}">
+				<div class="font" v-for="(font, index) in stageFonts" :key="font.index" :class="{loaded: font.loaded}">
 					<div class="variants">
 						<a href="#" class="variant" v-for="(variant, index) in font.variants" :key="variant.index" @click.prevent="setVariant(variant)">{{variant}}</a>
 					</div>

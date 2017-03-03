@@ -26,15 +26,14 @@ body {
   width: 100%;
 }
 #browse-font > .sidebar > .categories > .category {
-  color: inherit;
-  display: block;
+  align-items: center;
+  display: flex;
 }
 #browse-font > .sidebar > .categories > .category:not(:last-child) {
   margin-bottom: 10px;
 }
-#browse-font > .sidebar > .categories > .category:hover,
-#browse-font > .sidebar > .categories > .category.active {
-  text-decoration: underline;
+#browse-font > .sidebar > .categories > .category > input {
+  margin-right: 5px;
 }
 #browse-font > .stage {
   flex-grow: 1;
@@ -49,11 +48,9 @@ body {
 #browse-font > .stage > .inner > .fonts > .font:not(:last-child) {
   border-bottom: 1px solid #ccc;
 }
-#browse-font > .stage > .inner > .fonts > .font:not(.init) {
-  display: none;
-}
 #browse-font > .stage > .inner > .fonts > .font:not(.loaded) > .name {
-  visibility: hidden;
+  font-family: inherit !important;
+  opacity: .5;
 }
 #browse-font > .stage > .inner > .fonts > .font:hover {
   background-color: #eee;
@@ -76,6 +73,7 @@ body {
   font-size: 24px;
   line-height: 30px;
   margin-bottom: 5px;
+  transition: opacity .5s;
 }
 #browse-font > .stage > .inner > .fonts > .font > .category {
   font-size: 12px;

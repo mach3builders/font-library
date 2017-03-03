@@ -33,16 +33,15 @@ body {
 		
 		> .categories {
 			> .category {
-				color: inherit;
-				display: block;
+				align-items: center;
+				display: flex;
 				
 				&:not(:last-child) {
 					margin-bottom: 10px;
 				}
 				
-				&:hover,
-				&.active {
-					text-decoration: underline;;
+				> input {
+					margin-right: 5px;
 				}
 			}
 		}
@@ -67,13 +66,10 @@ body {
 						border-bottom: 1px solid #ccc;
 					}
 					
-					&:not(.init) {
-						display: none;
-					}
-					
 					&:not(.loaded) {
 						> .name {
-							visibility: hidden;
+							font-family: inherit !important;
+							opacity: .5;
 						}
 					}
 					
@@ -103,6 +99,7 @@ body {
 						font-size: 24px;
 						line-height: 30px;
 						margin-bottom: 5px;
+						transition: opacity .5s;
 					}
 					
 					> .category {
