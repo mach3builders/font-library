@@ -81,16 +81,27 @@ body {
 						display: flex;
 						margin-bottom: 10px;
 						
-						> .variant {
-							font-size: 12px;
-							
+						> span {
 							&:not(:last-child) {
-								margin-right: 5px;
+								&::after {
+									content: '|';
+									display: inline-block;
+									margin-left: 5px;
+									margin-right: 5px;
+								}
 							}
 							
-							&:hover,
-							&.active {
-								text-decoration: underline;;
+							> .variant {
+								font-size: 12px;
+								
+								&:not(:last-child) {
+									margin-right: 5px;
+								}
+								
+								&:hover,
+								&.active {
+									text-decoration: underline;
+								}
 							}
 						}
 					}

@@ -3,11 +3,11 @@ var browseFont = new Vue({
 	data: {
 		search: '',
 		categories: [
-			'serif',
-			'sans-serif',
-			'display',
-			'handwriting',
-			'monospace'
+			['serif', 'Serif'],
+			['sans-serif', 'Sans Serif'],
+			['display', 'Display'],
+			['handwriting', 'Handwriting'],
+			['monospace', 'Monospace']
 		],
 		selectedCategories: [],
 		fontHeight: 0,
@@ -19,8 +19,10 @@ var browseFont = new Vue({
 	mounted: function() {
 		var $stage = $('#browse-font .stage:first')
 		
-		this.selectedCategories = this.categories
-		this.stageHeight = $stage.height()
+		this.stageHeight		= $stage.height()
+		this.selectedCategories	= this.categories.map(function(category) {
+			return category[0]
+		})
 		
 		$(window).resize(function() {
 			browseFont.stageHeight = $stage.height()
@@ -28,8 +30,16 @@ var browseFont = new Vue({
 		
 		// https://www.googleapis.com/webfonts/v1/webfonts?key=AIzaSyCwmsa6nYDn0eZk_wzchsONgC3wO8nDmw0
 		$.getJSON('assets/json/fonts.json', function(data) {
-			browseFont.fonts = data.items.map(function(font) {
+			var fonts = data.items.filter(function(font) {
+				return font.subsets.indexOf('latin') !== -1
+			})
+			
+			browseFont.fonts = fonts.map(function(font) {
 				font.loaded = false
+				font.loadedVariants = ['regular']
+				font.variant = 'regular'
+				font.style = 'normal'
+				font.weight = 'normal'
 				
 				return font
 			})
@@ -48,7 +58,7 @@ var browseFont = new Vue({
 	methods: {
 		setStageFonts: function() {
 			if (this.fonts.length) {
-				var fonts = this.fonts.filter(function(font) {
+				var fonts = this.fonts.filter(function(font, index) {
 					var matchSearch = browseFont.search ? font.family.toLowerCase().search(browseFont.search.toLowerCase()) !== -1 : true
 					var matchCategories = true
 					
@@ -87,12 +97,12 @@ var browseFont = new Vue({
 			
 			console.log(families);
 			
-			// for (var i=0; i<families.length; i++) {
-			if (families.length) {
+			for (var i=0; i<families.length; i++) {
+			// if (families.length) {
 				WebFont.load({
 					google: {
-						// families: [families[i]]
-						families: families
+						families: [families[i]]
+						// families: families
 					},
 					fontactive: function(familyName) {
 						browseFont.fonts[indexes.indexOf(familyName)].loaded = true
@@ -121,6 +131,76 @@ var browseFont = new Vue({
 				browseFont.loadFonts(start, end)
 			},
 			duration)
+		},
+		setVariant: function(variant, font) {
+			if (font.loadedVariants.indexOf(variant) === -1) {
+				WebFont.load({
+					google: {
+						families: [font.family+':'+variant]
+					},
+					fontactive: function() {
+						font.loadedVariants.push(variant)
+						browseFont.setVariant(variant, font)
+					}
+				})
+			} else {
+				font.variant = variant
+				
+				var italicPos = variant.search('italic')
+				
+				if (italicPos > 0) {
+					font.style = 'italic'
+					font.weight = variant.substr(0, italicPos)
+				} else {
+					font.style = variant === 'italic' ? variant : 'normal'
+					font.weight = variant === 'regular' ? 'normal' : variant
+				}
+			}
+		},
+		getVariant: function(variant) {
+			var italicPos = variant.search('italic')
+			
+			if (italicPos > 0) {
+				variant = variant.substr(0, italicPos)
+			}
+			
+			switch (variant) {
+				case 'regular':
+					variant = 'Regular'
+					break
+				case 'italic':
+					variant = 'Italic'
+					break
+				case '100':
+					variant = 'Thin'
+					break
+				case '200':
+					variant = 'Extra-Ligh'
+					break
+				case '300':
+					variant = 'Light'
+					break
+				case '500':
+					variant = 'Medium'
+					break
+				case '600':
+					variant = 'Semi-Bold'
+					break
+				case '700':
+					variant = 'Bold'
+					break
+				case '800':
+					variant = 'Extra-Bold'
+					break
+				case '900':
+					variant = 'Black'
+			}
+			
+			if (italicPos > 0) {
+				variant += ' Italic'
+			}
+			
+			return variant
 		}
 	}
 })

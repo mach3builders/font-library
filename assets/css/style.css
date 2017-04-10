@@ -59,14 +59,20 @@ body {
   display: flex;
   margin-bottom: 10px;
 }
-#browse-font > .stage > .inner > .fonts > .font > .variants > .variant {
-  font-size: 12px;
-}
-#browse-font > .stage > .inner > .fonts > .font > .variants > .variant:not(:last-child) {
+#browse-font > .stage > .inner > .fonts > .font > .variants > span:not(:last-child)::after {
+  content: '|';
+  display: inline-block;
+  margin-left: 5px;
   margin-right: 5px;
 }
-#browse-font > .stage > .inner > .fonts > .font > .variants > .variant:hover,
-#browse-font > .stage > .inner > .fonts > .font > .variants > .variant.active {
+#browse-font > .stage > .inner > .fonts > .font > .variants > span > .variant {
+  font-size: 12px;
+}
+#browse-font > .stage > .inner > .fonts > .font > .variants > span > .variant:not(:last-child) {
+  margin-right: 5px;
+}
+#browse-font > .stage > .inner > .fonts > .font > .variants > span > .variant:hover,
+#browse-font > .stage > .inner > .fonts > .font > .variants > span > .variant.active {
   text-decoration: underline;
 }
 #browse-font > .stage > .inner > .fonts > .font > .name {

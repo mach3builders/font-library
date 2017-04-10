@@ -17,8 +17,8 @@
 		</div>
 		<div class="categories">
 			<div class="category" v-for="(category, index) in categories">
-				<input type="checkbox" v-model="selectedCategories" :value="category" :id="'field-category-' + index">
-				<label :for="'field-category-' + index">{{category}}</label>
+				<input type="checkbox" v-model="selectedCategories" :value="category[0]" :id="'field-category-' + index">
+				<label :for="'field-category-' + index">{{category[1]}}</label>
 			</div>
 		</div>
 	</div>
@@ -27,9 +27,11 @@
 			<div class="fonts">
 				<div class="font" v-for="(font, index) in stageFonts" :key="font.index" :class="{loaded: font.loaded}">
 					<div class="variants">
-						<a href="#" class="variant" v-for="(variant, index) in font.variants" :key="variant.index" @click.prevent="setVariant(variant)">{{variant}}</a>
+						<span v-for="(variant, index) in font.variants" :key="variant.index">
+							<a href="#" class="variant" :class="variant === font.variant ? 'active' : ''" @click.prevent="setVariant(variant, font)">{{getVariant(variant)}}</a>
+						</span>
 					</div>
-					<div class="name" :style="{'font-family': font.family}">{{font.family}}</div>
+					<div class="name" :style="{'font-family': font.family, 'font-style': font.style, 'font-weight': font.weight}">{{font.family}}</div>
 					<div class="category">{{font.category}}</div>
 				</div>
 			</div>
