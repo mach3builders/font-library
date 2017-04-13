@@ -95,8 +95,6 @@ var browseFont = new Vue({
 			
 			families = families.slice(start, end)
 			
-			console.log(families);
-			
 			for (var i=0; i<families.length; i++) {
 			// if (families.length) {
 				WebFont.load({
@@ -121,7 +119,7 @@ var browseFont = new Vue({
 			
 			this.timer = setTimeout(function() {
 				if (!browseFont.fontHeight) {
-					browseFont.fontHeight = $('#browse-font .font:first').outerHeight(true);
+					browseFont.fontHeight = $('#browse-font .font:first').outerHeight(true)
 				}
 				
 				var scrollTop = event ? $(event.target).scrollTop() : 0
